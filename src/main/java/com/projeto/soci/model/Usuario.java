@@ -1,11 +1,13 @@
 package com.projeto.soci.model;
 
+import com.projeto.soci.dto.DadosCadastroUsuario;
 import com.projeto.soci.enuns.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.ZoneId;
 import java.util.Date;
 
 @Entity(name = "usuario")
@@ -38,7 +40,19 @@ public class Usuario {
 
     private String rgm;
 
-
-
+    public Usuario(DadosCadastroUsuario dados) {
+        this.nome = dados.nome();
+        this.email = dados.email();
+        if (dados.dataNascimento() != null) {
+            this.data_nascimento = Date.from(dados.dataNascimento().atStartOfDay(ZoneId.systemDefault()).toInstant());
+        }
+        this.senha = dados.senha();
+        this.curso = dados.curso();
+        this.foto_perfil = dados.fotoPerfil();
+        this.biografia = dados.biografia();
+        this.tipo_usuario = dados.tipoUsuario();
+        this.rgm = dados.rgm();
+        this.data_criacao = new Date();
+    }
 
 }
