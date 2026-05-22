@@ -23,5 +23,6 @@ public class Conexao {
     @JoinColumn(name = "usuario_destino_id", referencedColumnName = "id_usuario")
     private Usuario usuarioDestino;
 
+    @Enumerated(EnumType.STRING)
     private StatusConexao statusConexao;
 }

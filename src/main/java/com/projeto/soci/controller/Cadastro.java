@@ -55,5 +55,10 @@ public class Cadastro {
         if (!deleted) return ResponseEntity.notFound().build();
         return ResponseEntity.noContent().build();
     }
+    @DeleteMapping
+    public ResponseEntity<Void> deletarUsuarios() {
+        cadastroService.deletarUsuarios();
+        return ResponseEntity.noContent().build();
+    }
 
 }

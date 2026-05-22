@@ -36,6 +36,7 @@ public class Usuario {
 
     private Date data_criacao;
 
+    @Enumerated(EnumType.STRING)
     private TipoUsuario tipo_usuario;
 
     private String rgm;

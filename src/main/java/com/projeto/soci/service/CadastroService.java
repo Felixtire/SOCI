@@ -18,11 +18,19 @@ public class CadastroService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    private final EncoderService encoderService;
+
+    public CadastroService(EncoderService encoderService){
+        this.encoderService = encoderService;
+    }
+
 
     @Transactional
     public DadosCadastroUsuarioSaida cadastrarUsuario(DadosCadastroUsuario dadosCadastroUsuario) {
 
         var usuario = new Usuario(dadosCadastroUsuario);
+
+        usuario.setSenha(encoderService.encode(usuario.getSenha()));
 
         usuarioRepository.save(usuario);
 
@@ -48,13 +56,15 @@ public class CadastroService {
         Optional<Usuario> opt = usuarioRepository.findById(id);
         if (opt.isEmpty()) return null;
         Usuario u = opt.get();
-        // update fields
         u.setNome(dados.nome());
         u.setEmail(dados.email());
         if (dados.dataNascimento() != null) {
             u.setData_nascimento(java.util.Date.from(dados.dataNascimento().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()));
         }
-        if (dados.senha() != null && !dados.senha().isBlank()) u.setSenha(dados.senha());
+        if (dados.senha() != null && !dados.senha().isBlank()){
+            u.setSenha(encoderService.encode(dados.senha()));
+
+        }
         u.setCurso(dados.curso());
         u.setFoto_perfil(dados.fotoPerfil());
         u.setBiografia(dados.biografia());
@@ -71,5 +81,10 @@ public class CadastroService {
         if (opt.isEmpty()) return false;
         usuarioRepository.delete(opt.get());
         return true;
+    }
+
+    @Transactional
+    public void deletarUsuarios() {
+        usuarioRepository.deleteAll();
     }
 }
