@@ -1,4 +1,4 @@
 package com.projeto.soci.dto;
 
-public record RespostaLoginDto(String token ) {
+public record RespostaLoginDto(Long idUsuario, String token ) {
 }

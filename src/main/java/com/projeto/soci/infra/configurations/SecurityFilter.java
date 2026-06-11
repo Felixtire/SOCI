@@ -14,9 +14,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
+
+    private static final Logger logger = Logger.getLogger(SecurityFilter.class.getName());
 
     @Autowired
     private TokenService tokenService;
@@ -33,7 +36,7 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         return path.equals("/login")
-                || path.equals("/cadastro")
+                || path.equals("/cadastrar")
                 || path.startsWith("/swagger-ui")
                 || path.startsWith("/v3/api-docs");
     }
@@ -41,21 +44,40 @@ public class SecurityFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        var path = request.getRequestURI();
-        var method = request.getMethod();
-
-
         var tokenJwt = recuperarToken(request);
+        String uri = request.getRequestURI();
+        String method = request.getMethod();
 
-        if (tokenJwt != null) {
-            var subject = tokenService.getSubject(tokenJwt);
-            var usuario = usuarioRepository.findByEmail(subject)
-                    .orElseThrow(()->new RuntimeException("Usuário não encontrado"));
+        try {
+            if (tokenJwt != null) {
+                logger.info("📋 Validando token para: " + method + " " + uri);
 
-            var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Valida e extrai o subject do token
+                var subject = tokenService.getSubject(tokenJwt);
+                logger.info("✅ Token validado para usuário: " + subject);
 
+                // Busca o usuário no banco
+                var usuario = usuarioRepository.findByEmail(subject)
+                        .orElseThrow(() -> {
+                            String msg = "❌ Usuário não encontrado no banco: " + subject;
+                            logger.severe(msg);
+                            return new RuntimeException(msg);
+                        });
+
+                // Configura a autenticação
+                var authentication = new UsernamePasswordAuthenticationToken(usuario, null, usuario.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.info("✅ Autenticação configurada para: " + subject + " | " + method + " " + uri);
+            } else {
+                logger.fine("⚠️  Nenhum token fornecido em: " + method + " " + uri);
+            }
+        } catch (Exception e) {
+            logger.severe("❌ Erro ao processar token: " + e.getMessage() + " | URI: " + uri);
+            e.printStackTrace();
+            // Limpa a autenticação em caso de erro
+            SecurityContextHolder.clearContext();
         }
+
         filterChain.doFilter(request, response);
     }
 

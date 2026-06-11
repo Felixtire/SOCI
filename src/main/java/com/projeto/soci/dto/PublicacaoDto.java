@@ -7,6 +7,7 @@ public record PublicacaoDto(
         String conteudo,
         String imagemUrl,
         LocalDateTime dataPublicacao,
-        Long usuarioId
+        Long usuarioId,
+        String nomeUsuario
 ) {
 }

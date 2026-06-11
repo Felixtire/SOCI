@@ -2,6 +2,8 @@ package com.projeto.soci.dto;
 
 import com.projeto.soci.model.Usuario;
 
+import java.util.Date;
+
 public record DadosCadastroUsuarioSaida(Long id, String nome, String email) {
 
     public DadosCadastroUsuarioSaida(Usuario u) {

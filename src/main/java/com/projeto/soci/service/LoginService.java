@@ -40,8 +40,10 @@ public class LoginService {
                     "Login ou senha inválidos"
             );
         }
+        var id = usuario.getId_usuario();
         var token = service.gerarToken(usuario);
-        return new RespostaLoginDto(token);
+
+        return new RespostaLoginDto(id,token);
 
     }
 

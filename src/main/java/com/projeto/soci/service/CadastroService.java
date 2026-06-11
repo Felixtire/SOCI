@@ -4,6 +4,11 @@ import com.projeto.soci.dto.DadosCadastroUsuario;
 import com.projeto.soci.dto.DadosCadastroUsuarioSaida;
 import com.projeto.soci.model.Usuario;
 import com.projeto.soci.repository.UsuarioRepository;
+import com.projeto.soci.repository.PublicacaoRepository;
+import com.projeto.soci.repository.ConexaoRepository;
+import com.projeto.soci.repository.ComentarioRepository;
+import com.projeto.soci.repository.CurtidasRepository;
+import com.projeto.soci.repository.EventoRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +22,21 @@ public class CadastroService {
 
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private PublicacaoRepository publicacaoRepository;
+
+    @Autowired
+    private ConexaoRepository conexaoRepository;
+
+    @Autowired
+    private ComentarioRepository comentarioRepository;
+
+    @Autowired
+    private CurtidasRepository curtidasRepository;
+
+    @Autowired
+    private EventoRepository eventoRepository;
 
     private final EncoderService encoderService;
 
@@ -38,8 +58,8 @@ public class CadastroService {
 
     }
 
-    public List<DadosCadastroUsuarioSaida> listarUsuarios() {
-        return usuarioRepository.findAll()
+    public List<DadosCadastroUsuarioSaida> listarUsuarios(Long idUsuarioLogado) {
+        return usuarioRepository.listarTodosMenosUm(idUsuarioLogado)
                 .stream()
                 .map(DadosCadastroUsuarioSaida::new)
                 .collect(Collectors.toList());
@@ -79,6 +99,19 @@ public class CadastroService {
     public boolean deletarUsuario(Long id) {
         Optional<Usuario> opt = usuarioRepository.findById(id);
         if (opt.isEmpty()) return false;
+
+        // deletar em ordem para não violar constraints (caso o schema atual não tenha ON DELETE CASCADE)
+        // 1. conexoes onde participa
+        conexaoRepository.deleteByUsuarioId(id);
+        // 2. curtidas e comentarios relacionados diretamente e por publicacoes
+        curtidasRepository.deleteByUsuarioOrPublicacaoUsuario(id);
+        comentarioRepository.deleteByUsuarioOrPublicacaoUsuario(id);
+        // 3. publicacoes do usuario
+        publicacaoRepository.deleteByUsuarioId(id);
+        // 4. eventos do usuario
+        eventoRepository.deleteByUsuarioId(id);
+
+        // 5. por fim, deletar o usuario
         usuarioRepository.delete(opt.get());
         return true;
     }

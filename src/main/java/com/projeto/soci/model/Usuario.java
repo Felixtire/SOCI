@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,27 @@ public class Usuario implements UserDetails {
 
     private String rgm;
 
+    // Relacionamentos que devem propagar operações (DELETE/MERGE/PERSIST) em cascata
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Publicacao> publicacoes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comentario> comentarios = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Curtidas> curtidas = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Evento> eventos = new ArrayList<>();
+
+    // conexões onde o usuário é origem
+    @OneToMany(mappedBy = "usuarioOrigem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conexao> conexoesOrigem = new ArrayList<>();
+
+    // conexões onde o usuário é destino
+    @OneToMany(mappedBy = "usuarioDestino", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Conexao> conexoesDestino = new ArrayList<>();
+
     public Usuario(DadosCadastroUsuario dados) {
         this.nome = dados.nome();
         this.email = dados.email();
@@ -61,6 +83,67 @@ public class Usuario implements UserDetails {
         this.tipo_usuario = dados.tipoUsuario();
         this.rgm = dados.rgm();
         this.data_criacao = new Date();
+    }
+
+    // Métodos auxiliares para manter ambos os lados do relacionamento sincronizados
+    public void addPublicacao(Publicacao p) {
+        publicacoes.add(p);
+        p.setUsuario(this);
+    }
+
+    public void removePublicacao(Publicacao p) {
+        publicacoes.remove(p);
+        p.setUsuario(null);
+    }
+
+    public void addComentario(Comentario c) {
+        comentarios.add(c);
+        c.setUsuario(this);
+    }
+
+    public void removeComentario(Comentario c) {
+        comentarios.remove(c);
+        c.setUsuario(null);
+    }
+
+    public void addCurtida(Curtidas cur) {
+        curtidas.add(cur);
+        cur.setUsuario(this);
+    }
+
+    public void removeCurtida(Curtidas cur) {
+        curtidas.remove(cur);
+        cur.setUsuario(null);
+    }
+
+    public void addEvento(Evento e) {
+        eventos.add(e);
+        e.setUsuario(this);
+    }
+
+    public void removeEvento(Evento e) {
+        eventos.remove(e);
+        e.setUsuario(null);
+    }
+
+    public void addConexaoOrigem(Conexao c) {
+        conexoesOrigem.add(c);
+        c.setUsuarioOrigem(this);
+    }
+
+    public void removeConexaoOrigem(Conexao c) {
+        conexoesOrigem.remove(c);
+        c.setUsuarioOrigem(null);
+    }
+
+    public void addConexaoDestino(Conexao c) {
+        conexoesDestino.add(c);
+        c.setUsuarioDestino(this);
+    }
+
+    public void removeConexaoDestino(Conexao c) {
+        conexoesDestino.remove(c);
+        c.setUsuarioDestino(null);
     }
 
     @Override

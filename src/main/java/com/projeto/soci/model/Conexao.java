@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 @Entity
 @Table(name = "Conexoes")
@@ -17,10 +19,12 @@ public class Conexao {
 
     @ManyToOne
     @JoinColumn(name = "usuario_origem_id", referencedColumnName = "id_usuario")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuarioOrigem;
 
     @ManyToOne
     @JoinColumn(name = "usuario_destino_id", referencedColumnName = "id_usuario")
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Usuario usuarioDestino;
 
     @Enumerated(EnumType.STRING)

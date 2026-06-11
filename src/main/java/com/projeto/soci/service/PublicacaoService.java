@@ -11,6 +11,7 @@ import com.projeto.soci.repository.UsuarioRepository;
 import com.projeto.soci.exception.NotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,12 +36,18 @@ public class PublicacaoService {
 
     @Transactional
     public PublicacaoDto criar(PublicacaoCreateDto dto) {
-        Usuario u = usuarioRepository.findById(dto.usuarioId()).orElseThrow(() -> new NotFoundException("Usuário não encontrado"));
-        Publicacao p = PublicacaoMapper.toEntity(dto, u);
+
+        Usuario usuarioLogado = (Usuario)
+                SecurityContextHolder.getContext()
+                        .getAuthentication()
+                        .getPrincipal();
+
+        Publicacao p = PublicacaoMapper.toEntity(dto, usuarioLogado);
+
         publicacaoRepository.save(p);
+
         return PublicacaoMapper.toDto(p);
     }
-
     @Transactional
     public PublicacaoDto atualizar(Long id, PublicacaoUpdateDto dto) {
         Publicacao p = publicacaoRepository.findById(id).orElseThrow(() -> new NotFoundException("Publicacao não encontrada"));

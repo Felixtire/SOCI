@@ -25,7 +25,8 @@ public class PublicacaoMapper {
                 p.getConteudo(),
                 p.getImagemUrl(),
                 p.getDataPublicacao(),
-                p.getUsuario() != null ? p.getUsuario().getId_usuario() : null
+                p.getUsuario() != null ? p.getUsuario().getId_usuario() : null,
+                p.getUsuario().getNome()
         );
     }
 

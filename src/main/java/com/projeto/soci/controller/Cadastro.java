@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/cadastro")
+@RequestMapping("/cadastrar")
 public class Cadastro {
 
     @Autowired
@@ -30,9 +30,9 @@ public class Cadastro {
 
     }
 
-    @GetMapping
-    public ResponseEntity<List<DadosCadastroUsuarioSaida>> listar() {
-        return ResponseEntity.ok(cadastroService.listarUsuarios());
+    @GetMapping("/{id}/usuarios")
+    public ResponseEntity<List<DadosCadastroUsuarioSaida>> listar(@PathVariable Long id) {
+        return ResponseEntity.ok(cadastroService.listarUsuarios(id));
     }
 
     @GetMapping("/{id}")

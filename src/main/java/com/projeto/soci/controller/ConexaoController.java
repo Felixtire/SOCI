@@ -42,4 +42,10 @@ public class ConexaoController {
         return conexaoService.listarConexoesPorUsuario(usuarioId);
 
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity deletarConexao(@PathVariable Long id) {
+        conexaoService.excluirConexoesPorUsuario(id);
+        return ResponseEntity.noContent().build();
+    }
 }
