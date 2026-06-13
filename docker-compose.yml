@@ -1,0 +1,59 @@
+﻿version: '3.9'
+services:
+  # Banco de Dados MySQL
+  mysql-soci:
+    image: mysql:8.0-alpine
+    container_name: soci-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: soci
+      MYSQL_USER: soci_user
+      MYSQL_PASSWORD: soci_password
+      MYSQL_ALLOW_EMPTY_PASSWORD: 'false'
+    ports:
+      - '3306:3306'
+    volumes:
+      - soci_db_data:/var/lib/mysql
+      - ./src/main/resources/EXECUTAR_ESTE_SCRIPT_NO_MYSQL.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - soci-network
+    healthcheck:
+      test: ['CMD', 'mysqladmin', 'ping', '-h', 'localhost', '-u', 'root', '-proot']
+      timeout: 20s
+      retries: 10
+      interval: 10s
+  # Aplicação Spring Boot
+  soci-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: soci-app
+    restart: unless-stopped
+    depends_on:
+      mysql-soci:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql-soci:3306/soci?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_JPA_SHOW_SQL: 'true'
+      SERVER_PORT: 8080
+      JAVA_OPTS: -Xmx1024m -Xms512m
+    ports:
+      - '8080:8080'
+    networks:
+      - soci-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:8080/swagger-ui.html']
+      timeout: 10s
+      retries: 5
+      interval: 30s
+      start_period: 40s
+volumes:
+  soci_db_data:
+    driver: local
+networks:
+  soci-network:
+    driver: bridge
