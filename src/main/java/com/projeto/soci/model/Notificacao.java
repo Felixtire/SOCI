@@ -23,6 +23,8 @@ public class Notificacao {
     @ManyToOne
     private Usuario usuario;
 
+    private Long idConexaoOriginaria;
+
 
 
 }

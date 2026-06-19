@@ -26,10 +26,10 @@ public class ConexaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ConexaoResponseDto(c));
     }
 
-    @PutMapping("/{conexaoId}/aceitar")
-    public ResponseEntity<?> aceitar(@PathVariable Long conexaoId){
+    @PutMapping("{conexaoId}/aceitar/{notificacaoId}")
+    public ResponseEntity<?> aceitar(@PathVariable Long conexaoId, @PathVariable Long notificacaoId) {
 
-        conexaoService.aceitarConexao(conexaoId);
+        conexaoService.aceitarConexao(conexaoId, notificacaoId);
 
         return ResponseEntity.ok("Conexão aceita");
     }

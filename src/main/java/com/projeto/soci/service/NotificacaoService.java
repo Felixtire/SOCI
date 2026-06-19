@@ -26,15 +26,23 @@ public class NotificacaoService {
 
 
     @Transactional
-    public void criarNotificacao(Long id, String mensagem) {
+    public void criarNotificacao(
+            Long id,
+            String mensagem,
+            Long idConexaoOriginaria
+    ) {
 
-        var usuario = usuarioRepository.findById(id).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        var usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
 
         Notificacao notificacao = new Notificacao();
+
         notificacao.setUsuario(usuario);
 
         notificacao.setMensagem(mensagem);
 
+        notificacao.setIdConexaoOriginaria(idConexaoOriginaria);
 
 
         notificacaoRepository.save(notificacao);
@@ -55,14 +63,25 @@ public class NotificacaoService {
 
     }
 
-    public void notificarConexaoAceita(Long usuarioDestinoId, Long usuarioOrigemId) {
-        var usuarioOrigem = usuarioRepository.findById(usuarioOrigemId).orElseThrow(() -> new RuntimeException("Usuário de origem não encontrado"));
+    public void notificarConexaoAceita(
+            Long usuarioDestinoId,
+            Long usuarioOrigemId,
+            Long idConexaoOriginaria
+    ) {
 
-        var nomeUsuarioOrigem = usuarioOrigem.getNome();
+        var usuarioAceitou = usuarioRepository.findById(usuarioOrigemId)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
-        var mensagem = "Sua solicitação de conexão foi aceita por " + nomeUsuarioOrigem + ".";
 
-        criarNotificacao(usuarioDestinoId, mensagem);
+        String mensagem = usuarioAceitou.getNome()
+                + " aceitou sua solicitação de conexão.";
+
+
+        criarNotificacao(
+                usuarioDestinoId,
+                mensagem,
+                idConexaoOriginaria
+        );
     }
 
 }

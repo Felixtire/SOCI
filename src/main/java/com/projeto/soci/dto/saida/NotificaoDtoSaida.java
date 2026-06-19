@@ -10,11 +10,13 @@ public record NotificaoDtoSaida(
 
         String mensagem,
 
-        Long idUsuarioDestino
+        Long idUsuarioDestino,
+
+        Long idConexaoOriginaria
 
 
 ) {
     public NotificaoDtoSaida(Notificacao resposta) {
-        this(resposta.getId_notificacao(), resposta.getMensagem(), resposta.getUsuario().getId_usuario());
+        this(resposta.getId_notificacao(), resposta.getMensagem(), resposta.getUsuario().getId_usuario(), resposta.getIdConexaoOriginaria());
     }
 }

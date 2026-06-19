@@ -1,6 +1,9 @@
 package com.projeto.soci.service;
 
+import com.projeto.soci.dto.saida.ConexaoOriginaria;
 import com.projeto.soci.dto.saida.ConexaoResponseDto;
+import com.projeto.soci.dto.saida.RespostaLoginDto;
+import com.projeto.soci.dto.saida.RespostaNotificacaoAgrupada;
 import com.projeto.soci.enuns.StatusConexao;
 import com.projeto.soci.model.Conexao;
 import com.projeto.soci.repository.ConexaoRepository;
@@ -34,7 +37,12 @@ public class ConexaoService {
             throw new RuntimeException("Usuário de origem e destino não podem ser o mesmo");
         }
 
-        if (conexaoExiste(origemId, destinoId) && conexaoAceitaExiste(origemId,destinoId) ) {
+        if (conexaoAceitaExiste(origemId, destinoId)) {
+            throw new RuntimeException("Conexão já existe entre os usuários");
+        }
+
+
+        if (conexaoExiste(origemId, destinoId) ) {
             throw new RuntimeException("Conexão já existe entre os usuários");
         }
 
@@ -50,27 +58,40 @@ public class ConexaoService {
 
         var mensagem = usuarioOrigem.getNome() + " enviou uma solicitação de conexão para você.";
 
-        notificacaoService.criarNotificacao(destinoId, mensagem);
-        return conexaoRepository.save(conexao);
+        // Salva primeiro para obter o id gerado pelo banco e então cria a notificação com esse id
+        var conexaoSalva = conexaoRepository.save(conexao);
+
+        notificacaoService.criarNotificacao(destinoId, mensagem, conexaoSalva.getId_conexao());
+        return conexaoSalva;
 
     }
 
     @Transactional
-    public void aceitarConexao(Long conexaoId){
-        var conexao = conexaoRepository.findById(conexaoId).orElseThrow(() -> new RuntimeException("Conexão não encontrada"));
+    public void aceitarConexao(Long conexaoId, Long notificacaoId) {
 
-        var usuarioOrigem = conexao.getUsuarioOrigem().getId_usuario(); // o usuário origem é quem envia a solicitação de conexão, então é ele quem recebe a notificação de que a conexão foi aceita
+        var conexao = conexaoRepository.findById(conexaoId)
+                .orElseThrow(() -> new RuntimeException("Conexão não encontrada"));
 
-        var usuarioDestino = conexao.getUsuarioDestino().getId_usuario();// o usuário destino é quem aceita a conexão, então é ele quem recebe a notificação
+
+        var usuarioOrigem = conexao.getUsuarioOrigem().getId_usuario();
+
+        var usuarioDestino = conexao.getUsuarioDestino().getId_usuario();
+
 
         conexao.setStatusConexao(StatusConexao.ACEITA);
 
-        notificacaoService.notificarConexaoAceita(usuarioOrigem, usuarioDestino);
+        notificacaoService.apagarNoficacao(notificacaoId);
 
+
+
+        notificacaoService.notificarConexaoAceita(
+                usuarioOrigem,
+                usuarioDestino,
+                conexao.getId_conexao()
+        );
 
 
         conexaoRepository.save(conexao);
-
     }
 
     @Transactional
