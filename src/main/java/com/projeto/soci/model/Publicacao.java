@@ -37,7 +37,7 @@ public class Publicacao {
     @OneToMany(mappedBy = "publicacao", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Curtidas> curtidas = new ArrayList<>();
 
-    // Métodos auxiliares para manter ambos os lados sincronizados
+
     public void addComentario(Comentario c) {
         comentarios.add(c);
         c.setPublicacao(this);

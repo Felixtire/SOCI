@@ -26,4 +26,17 @@ public interface ConexaoRepository extends JpaRepository<Conexao,Long> {
     @Modifying
     @Query("delete from Conexao c where c.usuarioOrigem.id_usuario = :userId or c.usuarioDestino.id_usuario = :userId")
     void deleteByUsuarioId(@Param("userId") Long userId);
+
+   @Query(
+           """
+                   SELECT c FROM Conexao c
+                   where
+                   c.usuarioDestino.id_usuario = :usuarioDestinoId
+                   and 
+                   c.statusConexao = 'ACEITA'
+                   
+                   """
+
+   )
+    List<Conexao> listarConexoesAceitasPorUsuarioDestino(@Param("usuarioDestinoId") Long usuarioDestinoId);
 }

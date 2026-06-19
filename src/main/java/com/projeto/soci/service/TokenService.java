@@ -4,7 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.projeto.soci.model.Usuario;
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -14,7 +14,8 @@ import java.time.ZoneOffset;
 @Service
 public class TokenService {
 
-    private String secretkey="123456";
+    @Value("${security.secret-key}")
+    private String secretkey;
 
 
     public String gerarToken( Usuario usuario){

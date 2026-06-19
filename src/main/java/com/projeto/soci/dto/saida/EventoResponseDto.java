@@ -1,4 +1,4 @@
-package com.projeto.soci.dto;
+package com.projeto.soci.dto.saida;
 
 import com.projeto.soci.model.Evento;
 

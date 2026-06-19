@@ -1,12 +1,11 @@
 package com.projeto.soci.service;
 
-import com.projeto.soci.dto.ConexaoResponseDto;
+import com.projeto.soci.dto.saida.ConexaoResponseDto;
 import com.projeto.soci.enuns.StatusConexao;
 import com.projeto.soci.model.Conexao;
 import com.projeto.soci.repository.ConexaoRepository;
 import com.projeto.soci.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
-import org.hibernate.query.sql.internal.ParameterRecognizerImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +19,9 @@ public class ConexaoService {
     @Autowired
     private UsuarioRepository usuarioRepository;
 
+    @Autowired
+    private NotificacaoService notificacaoService;
+
     public Conexao conectarUsuarios(Long origemId, Long destinoId) {
 
         var usuarioOrigem = usuarioRepository.findById(origemId).orElseThrow(() -> new RuntimeException("Usuário de origem não encontrado"));
@@ -32,7 +34,7 @@ public class ConexaoService {
             throw new RuntimeException("Usuário de origem e destino não podem ser o mesmo");
         }
 
-        if (conexaoExiste(origemId, destinoId)) {
+        if (conexaoExiste(origemId, destinoId) && conexaoAceitaExiste(origemId,destinoId) ) {
             throw new RuntimeException("Conexão já existe entre os usuários");
         }
 
@@ -46,11 +48,47 @@ public class ConexaoService {
 
         conexao.setStatusConexao(StatusConexao.PENDENTE); // o outro usuário precisa aceitar a conexão
 
+        var mensagem = usuarioOrigem.getNome() + " enviou uma solicitação de conexão para você.";
 
+        notificacaoService.criarNotificacao(destinoId, mensagem);
         return conexaoRepository.save(conexao);
 
+    }
+
+    @Transactional
+    public void aceitarConexao(Long conexaoId){
+        var conexao = conexaoRepository.findById(conexaoId).orElseThrow(() -> new RuntimeException("Conexão não encontrada"));
+
+        var usuarioOrigem = conexao.getUsuarioOrigem().getId_usuario(); // o usuário origem é quem envia a solicitação de conexão, então é ele quem recebe a notificação de que a conexão foi aceita
+
+        var usuarioDestino = conexao.getUsuarioDestino().getId_usuario();// o usuário destino é quem aceita a conexão, então é ele quem recebe a notificação
+
+        conexao.setStatusConexao(StatusConexao.ACEITA);
+
+        notificacaoService.notificarConexaoAceita(usuarioOrigem, usuarioDestino);
+
+
+
+        conexaoRepository.save(conexao);
 
     }
+
+    @Transactional
+    public void recusarConexao(Long conexaoId, Long notificacaoId){
+        var conexao = conexaoRepository.findById(conexaoId).orElseThrow(() -> new RuntimeException("Conexão não encontrada"));
+
+        var usuarioOrigem = conexao.getUsuarioOrigem().getId_usuario();
+
+        var usuarioDestino = conexao.getUsuarioDestino().getId_usuario();
+
+        conexao.setStatusConexao(StatusConexao.RECUSADA);
+
+        notificacaoService.apagarNoficacao(notificacaoId);
+
+        conexaoRepository.save(conexao);
+
+    }
+
 
     private Boolean conexaoExiste(Long origemId, Long destinoId) {
         return conexaoRepository.ligarConexoesPorUsuario(origemId)
@@ -58,8 +96,16 @@ public class ConexaoService {
                 .anyMatch(c -> (c.getUsuarioDestino().getId_usuario().equals(destinoId) || c.getUsuarioOrigem().getId_usuario().equals(destinoId)));
     }
 
-    public List<Conexao> listarConexoes() {
-        return conexaoRepository.findAll();
+    private Boolean conexaoAceitaExiste(Long origemId, Long destinoId) {
+        return conexaoRepository.ligarConexoesPorUsuario(origemId)
+                .stream()
+                .anyMatch(c -> (c.getUsuarioDestino().getId_usuario().equals(destinoId) || c.getUsuarioOrigem().getId_usuario().equals(destinoId)) && c.getStatusConexao() == StatusConexao.ACEITA);
+    }
+
+    public List<Conexao> listarConexoes(Long usuarioLogadoId) {
+
+        return conexaoRepository.listarConexoesAceitasPorUsuarioDestino(usuarioLogadoId);
+
     }
 
     public List<ConexaoResponseDto> listarConexoesPorUsuario(Long usuarioId) {

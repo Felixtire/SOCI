@@ -1,8 +1,6 @@
-package com.projeto.soci.dto;
+package com.projeto.soci.dto.saida;
 
 import com.projeto.soci.model.Usuario;
-
-import java.util.Date;
 
 public record DadosCadastroUsuarioSaida(Long id, String nome, String email) {
 

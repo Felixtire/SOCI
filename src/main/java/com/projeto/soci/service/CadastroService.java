@@ -1,7 +1,7 @@
 package com.projeto.soci.service;
 
-import com.projeto.soci.dto.DadosCadastroUsuario;
-import com.projeto.soci.dto.DadosCadastroUsuarioSaida;
+import com.projeto.soci.dto.entrada.DadosCadastroUsuario;
+import com.projeto.soci.dto.saida.DadosCadastroUsuarioSaida;
 import com.projeto.soci.model.Usuario;
 import com.projeto.soci.repository.UsuarioRepository;
 import com.projeto.soci.repository.PublicacaoRepository;

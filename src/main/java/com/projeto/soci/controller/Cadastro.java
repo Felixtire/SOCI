@@ -1,7 +1,7 @@
 package com.projeto.soci.controller;
 
-import com.projeto.soci.dto.DadosCadastroUsuario;
-import com.projeto.soci.dto.DadosCadastroUsuarioSaida;
+import com.projeto.soci.dto.entrada.DadosCadastroUsuario;
+import com.projeto.soci.dto.saida.DadosCadastroUsuarioSaida;
 import com.projeto.soci.service.CadastroService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

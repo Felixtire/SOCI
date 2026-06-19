@@ -1,6 +1,6 @@
 package com.projeto.soci.model;
 
-import com.projeto.soci.dto.DadosCadastroUsuario;
+import com.projeto.soci.dto.entrada.DadosCadastroUsuario;
 import com.projeto.soci.enuns.TipoUsuario;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -25,6 +25,7 @@ import java.util.List;
 public class Usuario implements UserDetails {
 
     @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id_usuario")
     private Long id_usuario;
 
     private String nome;
@@ -49,7 +50,7 @@ public class Usuario implements UserDetails {
 
     private String rgm;
 
-    // Relacionamentos que devem propagar operações (DELETE/MERGE/PERSIST) em cascata
+
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Publicacao> publicacoes = new ArrayList<>();
 
@@ -62,13 +63,15 @@ public class Usuario implements UserDetails {
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Evento> eventos = new ArrayList<>();
 
-    // conexões onde o usuário é origem
     @OneToMany(mappedBy = "usuarioOrigem", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conexao> conexoesOrigem = new ArrayList<>();
 
-    // conexões onde o usuário é destino
+
     @OneToMany(mappedBy = "usuarioDestino", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Conexao> conexoesDestino = new ArrayList<>();
+
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notificacao> notificacoes = new ArrayList<>();
 
     public Usuario(DadosCadastroUsuario dados) {
         this.nome = dados.nome();
@@ -85,7 +88,7 @@ public class Usuario implements UserDetails {
         this.data_criacao = new Date();
     }
 
-    // Métodos auxiliares para manter ambos os lados do relacionamento sincronizados
+
     public void addPublicacao(Publicacao p) {
         publicacoes.add(p);
         p.setUsuario(this);

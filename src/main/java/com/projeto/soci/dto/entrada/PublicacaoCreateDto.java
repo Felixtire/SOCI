@@ -1,14 +1,14 @@
-package com.projeto.soci.dto;
+package com.projeto.soci.dto.entrada;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-public record PublicacaoUpdateDto(
+public record PublicacaoCreateDto(
         @NotBlank(message = "Conteúdo é obrigatório")
-        @Size(max = 2000, message = "Conteúdo muito longo")
         String conteudo,
 
         @Size(max = 1024, message = "URL da imagem muito longa")
         String imagemUrl
+
 ) {
 }

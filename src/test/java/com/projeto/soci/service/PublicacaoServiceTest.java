@@ -1,7 +1,7 @@
 package com.projeto.soci.service;
 
-import com.projeto.soci.dto.PublicacaoCreateDto;
-import com.projeto.soci.dto.PublicacaoDto;
+import com.projeto.soci.dto.entrada.PublicacaoCreateDto;
+import com.projeto.soci.dto.saida.PublicacaoDto;
 import com.projeto.soci.mapper.PublicacaoMapper;
 import com.projeto.soci.model.Publicacao;
 import com.projeto.soci.model.Usuario;

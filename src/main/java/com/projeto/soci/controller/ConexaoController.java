@@ -1,7 +1,6 @@
 package com.projeto.soci.controller;
 
-import com.projeto.soci.model.Conexao;
-import com.projeto.soci.dto.ConexaoResponseDto;
+import com.projeto.soci.dto.saida.ConexaoResponseDto;
 import com.projeto.soci.service.ConexaoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +26,26 @@ public class ConexaoController {
         return ResponseEntity.status(HttpStatus.CREATED).body(new ConexaoResponseDto(c));
     }
 
+    @PutMapping("/{conexaoId}/aceitar")
+    public ResponseEntity<?> aceitar(@PathVariable Long conexaoId){
+
+        conexaoService.aceitarConexao(conexaoId);
+
+        return ResponseEntity.ok("Conexão aceita");
+    }
+
+    @PutMapping("/{conexaoId}/recusar/{notificacaoId}")
+    public ResponseEntity<?> recusar(@PathVariable Long conexaoId, @PathVariable Long notificacaoId) {
+        conexaoService.recusarConexao(conexaoId, notificacaoId);
+
+        return ResponseEntity.ok("Conexão recusada");
+    }
 
 
-    @GetMapping
-    public List<ConexaoResponseDto> listarConexoes() {
-        return conexaoService.listarConexoes()
+
+    @GetMapping("/aceitas/{usuarioId}")
+    public List<ConexaoResponseDto> listarConexoes(@PathVariable Long usuarioId) {
+        return conexaoService.listarConexoes(usuarioId)
                 .stream()
                 .map(ConexaoResponseDto::new)
                 .collect(Collectors.toList());

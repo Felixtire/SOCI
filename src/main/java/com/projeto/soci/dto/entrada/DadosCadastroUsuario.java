@@ -1,4 +1,4 @@
-package com.projeto.soci.dto;
+package com.projeto.soci.dto.entrada;
 
 import com.projeto.soci.enuns.TipoUsuario;
 import jakarta.validation.constraints.*;

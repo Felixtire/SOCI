@@ -1,7 +1,7 @@
 package com.projeto.soci.controller;
 
 
-import com.projeto.soci.dto.DadosLogin;
+import com.projeto.soci.dto.entrada.DadosLogin;
 import com.projeto.soci.repository.UsuarioRepository;
 import com.projeto.soci.service.LoginService;
 import com.projeto.soci.service.TokenService;

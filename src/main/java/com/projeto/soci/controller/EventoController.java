@@ -1,9 +1,8 @@
 package com.projeto.soci.controller;
 
 
-import com.projeto.soci.dto.EventoRequestDto;
-import com.projeto.soci.dto.EventoResponseDto;
-import com.projeto.soci.model.Evento;
+import com.projeto.soci.dto.entrada.EventoRequestDto;
+import com.projeto.soci.dto.saida.EventoResponseDto;
 import com.projeto.soci.service.EventoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

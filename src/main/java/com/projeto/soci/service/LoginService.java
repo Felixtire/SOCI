@@ -1,7 +1,7 @@
 package com.projeto.soci.service;
 
-import com.projeto.soci.dto.DadosLogin;
-import com.projeto.soci.dto.RespostaLoginDto;
+import com.projeto.soci.dto.entrada.DadosLogin;
+import com.projeto.soci.dto.saida.RespostaLoginDto;
 import com.projeto.soci.repository.UsuarioRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;

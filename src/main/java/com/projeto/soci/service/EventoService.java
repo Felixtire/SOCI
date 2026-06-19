@@ -1,7 +1,7 @@
 package com.projeto.soci.service;
 
-import com.projeto.soci.dto.EventoRequestDto;
-import com.projeto.soci.dto.EventoResponseDto;
+import com.projeto.soci.dto.entrada.EventoRequestDto;
+import com.projeto.soci.dto.saida.EventoResponseDto;
 import com.projeto.soci.model.Evento;
 import com.projeto.soci.model.Usuario;
 import com.projeto.soci.repository.EventoRepository;

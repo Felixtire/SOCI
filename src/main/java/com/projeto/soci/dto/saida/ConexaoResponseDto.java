@@ -1,7 +1,6 @@
-package com.projeto.soci.dto;
+package com.projeto.soci.dto.saida;
 
 import com.projeto.soci.model.Conexao;
-import com.projeto.soci.model.Usuario;
 
 public record ConexaoResponseDto(
         Long conexaoId,
@@ -15,7 +14,6 @@ public record ConexaoResponseDto(
     public ConexaoResponseDto(Conexao resposta) {
         this(resposta.getId_conexao(), resposta.getUsuarioOrigem().getId_usuario(),  resposta.getUsuarioOrigem().getNome(),resposta.getUsuarioDestino().getId_usuario(), resposta.getUsuarioDestino().getNome(), resposta.getUsuarioOrigem().getFoto_perfil(), resposta.getUsuarioDestino().getFoto_perfil());
     }
-
 
 
 }
